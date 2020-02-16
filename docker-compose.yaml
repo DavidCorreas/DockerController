@@ -2,8 +2,36 @@ version: "3"
 services:
   API-docker :
     image: api-docker
-    build: .
+    build: EasyDockerREST/
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - easy-docker-net
+#  sql:
+#    container_name: mysql
+#    build: MySQL/
+#    user: root
+#    ports:
+#      - "8081:3306"
+#    environment:
+#      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#      MYSQL_DATABASE: ${MYSQL_DATABASE}
+#      MYSQL_USER: ${MYSQL_USER}
+#      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#    networks:
+#      - easy-docker-net
+  registry:
+    container_name: registry
+    image: registry
+    ports:
+      - "5000:5000"
+    networks:
+      - easy-docker-net
+    volumes:
+      - ./tmp-registry:/var/lib/registry
+
+networks:
+  easy-docker-net:
+    
