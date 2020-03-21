@@ -22,13 +22,15 @@ RUN apt-get -y install apt-transport-https \
 
 RUN curl -L "https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
 
-COPY requirements.txt /app/requirements.txt
+COPY . /app
 WORKDIR /app
 RUN pip install -r requirements.txt
+ENV PYTHONPATH "${PYTHONPATH}:/app/src"
 
-COPY . /app
+EXPOSE 9090
+EXPOSE 5000
 
+WORKDIR /app/src
 ENTRYPOINT [ "python" ]
-
 CMD [ "APIDocker.py" ]
 
