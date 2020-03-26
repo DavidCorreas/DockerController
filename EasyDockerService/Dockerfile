@@ -1,7 +1,13 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
-RUN apt-get update -y && \
-    apt-get install -y python-pip python-dev
+ARG source_dir
+ARG entry_file
+
+RUN apt-get update \
+  && apt-get install -y python3-pip python3-dev \
+  && cd /usr/local/bin \
+  && ln -s /usr/bin/python3 python \
+  && pip3 install --upgrade pip
 
 # Instala Docker
 
@@ -20,17 +26,14 @@ RUN apt-get -y install apt-transport-https \
 
 # Compose
 
-RUN curl -L "https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
+RUN curl -L "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
 
-COPY . /app
+COPY $source_dir /app
+COPY src/DockerHandler.py /app/
 WORKDIR /app
 RUN pip install -r requirements.txt
-ENV PYTHONPATH "${PYTHONPATH}:/app/src"
+ENV PYTHONPATH "${PYTHONPATH}:/app"
 
-EXPOSE 9090
-EXPOSE 5000
+CMD python ${entry_file}
 
-WORKDIR /app/src
-ENTRYPOINT [ "python" ]
-CMD [ "APIDocker.py" ]
 

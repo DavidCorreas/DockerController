@@ -1,38 +1,68 @@
-version: "3"
+version: "3.7"
 services:
-  api-docker :
-    image: api-docker
-    build: EasyDockerREST/
-    ports:
-      - "5001:5000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - easy-docker-net
-  mysql-database:
-    container_name: easy-docker-mysql
-    image: mysql:8.0.19
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    restart: always
-    ports:
-      - "3308:3306"
-    networks:
-      - easy-docker-net
-    volumes:
-      - ./data:/var/lib/mysql
-  registry:
-    container_name: registry
-    image: registry
-    ports:
-      - "5000:5000"
-    networks:
-      - easy-docker-net
-    volumes:
-      - ./tmp-registry:/var/lib/registry
+#  rest-api:
+#    container_name: rest-api
+#    build:
+#      context: EasyDockerService/
+#      args:
+#        source_dir: ./src/REST
+#    environment:
+#      entry_file: RestApi.py
+#    expose:
+#      - "9090"
+#      - "5000"
+#    ports:
+#      - "5001:5000"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    networks:
+#      - easy-docker-net
+#  rabbit-api:
+#    image: rabbitmq:3-management-alpine
+#    container_name: rabbit-api
+#    build:
+#      context: EasyDockerService/
+#      args:
+#        source_dir: ./src/REST
+#    environment:
+#      entry_file: RabbitClient.py
+#      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+#      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+#    expose:
+#      - "15672"
+#      - "15672"
+#    ports:
+#      - "5672:5672"
+#      - "15672:15672"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    networks:
+#      - easy-docker-net
+
+#  mysql-database:
+#    container_name: easy-docker-mysql
+#    image: mysql:8.0.19
+#    environment:
+#      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#      MYSQL_DATABASE: ${MYSQL_DATABASE}
+#      MYSQL_USER: ${MYSQL_USER}
+#      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#    restart: always
+#    ports:
+#      - "3308:3306"
+#    networks:
+#      - easy-docker-net
+#    volumes:
+#      - ./data:/var/lib/mysql
+#  registry:
+#    container_name: registry
+#    image: registry
+#    ports:
+#      - "5000:5000"
+#    networks:
+#      - easy-docker-net
+#    volumes:
+#      - ./tmp-registry:/var/lib/registry
 
 networks:
   easy-docker-net:

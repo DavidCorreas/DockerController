@@ -1,5 +1,5 @@
 import docker
-from TCPHandler import TCPConnection
+from REST.TCPHandler import TCPConnection
 import tempfile
 
 client = docker.from_env()
