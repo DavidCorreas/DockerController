@@ -18,11 +18,11 @@ class RabbitHandler:
         print(" [x] Awaiting RPC requests")
         self.channel.start_consuming()
 
-    def send_message(self, response, routing_key, correlation_id, delivery_tag):
-        self.channel.basic_publish(exchange='',
-                                   routing_key=routing_key,
-                                   properties=pika.BasicProperties(correlation_id=correlation_id),
-                                   body=response)
+    @staticmethod
+    def send_message(response, channel, routing_key, correlation_id, delivery_tag):
+        channel.basic_publish(exchange='',
+                              routing_key=routing_key,
+                              properties=pika.BasicProperties(correlation_id=correlation_id),
+                              body=response)
 
-        self.channel.basic_ack(delivery_tag=delivery_tag)
-
+        channel.basic_ack(delivery_tag=delivery_tag)
