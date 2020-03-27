@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.2"
 services:
 #  rest-api:
 #    container_name: rest-api
@@ -17,27 +17,39 @@ services:
 #      - /var/run/docker.sock:/var/run/docker.sock
 #    networks:
 #      - easy-docker-net
-#  rabbit-api:
-#    image: rabbitmq:3-management-alpine
-#    container_name: rabbit-api
-#    build:
-#      context: EasyDockerService/
-#      args:
-#        source_dir: ./src/REST
-#    environment:
-#      entry_file: RabbitClient.py
-#      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-#      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-#    expose:
-#      - "15672"
-#      - "15672"
-#    ports:
-#      - "5672:5672"
-#      - "15672:15672"
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    networks:
-#      - easy-docker-net
+#
+  rabbitmq:
+    image: rabbitmq:3.8.3-management-alpine
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    expose:
+      - "5672"
+      - "15672"
+    networks:
+      - easy-docker-net
+
+  rabbit-api:
+    container_name: rabbit-api
+    build:
+      context: EasyDockerService/
+      args:
+        source_dir: ./src/Rabbit
+    depends_on:
+      - rabbitmq
+    tty: true
+    environment:
+      entry_file: RabbitHandler.py
+    ports:
+      - "3000:3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - easy-docker-net
 
 #  mysql-database:
 #    container_name: easy-docker-mysql
