@@ -43,7 +43,7 @@ services:
       - rabbitmq
     tty: true
     environment:
-      entry_file: RabbitHandler.py
+      entry_file: DockerFunctions.py
     ports:
       - "3000:3000"
     volumes:

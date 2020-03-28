@@ -19,10 +19,13 @@ class RabbitHandler:
         self.channel.start_consuming()
 
     @staticmethod
-    def send_message(response, channel, routing_key, correlation_id, delivery_tag):
+    def send_message(response, channel, routing_key, correlation_id):
         channel.basic_publish(exchange='',
                               routing_key=routing_key,
-                              properties=pika.BasicProperties(correlation_id=correlation_id),
+                              properties=pika.BasicProperties(correlation_id=correlation_id,
+                                                              content_type='application/json'),
                               body=response)
 
+    @staticmethod
+    def ack(channel, delivery_tag):
         channel.basic_ack(delivery_tag=delivery_tag)
