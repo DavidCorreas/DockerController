@@ -98,7 +98,7 @@ class DockerFunctions:
             for image in images:
                 print(str(image))
                 if image.tags:
-                    tags_image = tags_image + image.tags + "\n"
+                    tags_image = tags_image + str(image.tags) + "\n"
             response = {'response': tags_image}
             self.connection.send_message(response=json.dumps(response),
                                          channel=channel,
