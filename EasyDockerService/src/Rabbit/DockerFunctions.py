@@ -32,7 +32,8 @@ class DockerFunctions:
         except APIError as e:
             error = "ERROR: DockerApi error: \n" + str(e)
             print(error)
-            self.connection.send_message(response=json.dumps(error),
+            response = {'response': error}
+            self.connection.send_message(response=json.dumps(response),
                                          channel=channel,
                                          routing_key=props.reply_to,
                                          correlation_id=props.correlation_id)
@@ -78,7 +79,8 @@ class DockerFunctions:
         except APIError as e:
             error = "ERROR: DockerApi error: \n" + str(e)
             print(error)
-            self.connection.send_message(response=json.dumps(error),
+            response = {'response': error}
+            self.connection.send_message(response=json.dumps(response),
                                          channel=channel,
                                          routing_key=props.reply_to,
                                          correlation_id=props.correlation_id)
@@ -107,7 +109,8 @@ class DockerFunctions:
         except APIError as e:
             error = "ERROR: DockerApi error: \n" + str(e)
             print(error)
-            self.connection.send_message(response=json.dumps(error),
+            response = {'response': error}
+            self.connection.send_message(response=json.dumps(response),
                                          channel=channel,
                                          routing_key=props.reply_to,
                                          correlation_id=props.correlation_id)
@@ -128,7 +131,8 @@ class DockerFunctions:
         except APIError as e:
             error = "ERROR: DockerApi error: \n" + str(e)
             print(error)
-            self.connection.send_message(response=json.dumps(error),
+            response = {'response': error}
+            self.connection.send_message(response=json.dumps(response),
                                          channel=channel,
                                          routing_key=props.reply_to,
                                          correlation_id=props.correlation_id)
