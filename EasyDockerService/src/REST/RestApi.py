@@ -35,27 +35,27 @@ def tag():
         return jsonify({'Nombre': params['name'], 'Tag': params['tag']})
 
 
-@app.route('/push', methods=['POST'])
-def push():
-    if request.method == 'POST':
-        decoded_data = request.data.decode('utf-8')
-        params = json.loads(decoded_data)
-
-        client.images.push("localhost:5000/" + params['name'], params['tag'])
-
-        return jsonify({'PRUEBA NOMBER': params['name'], 'PRUEBA ARRS': params['tag']})
-
-
-@app.route('/check-compose', methods=['POST'])
-def check_compose():
-    if request.method == 'POST':
-        decoded_data = request.data.decode('utf-8')
-        params = json.loads(decoded_data)
-
-        f = tempfile.NamedTemporaryFile()
-        f.write(params['docker-composeFile'])
-        with subprocess.Popen(["docker-compose"], stdout=subprocess.PIPE) as proc:
-            print(jsonify({'PRUEBA': proc.stdout.read(), 'PRUEBA ARRS': "params['tag']"}))
+# @app.route('/push', methods=['POST'])
+# def push():
+#     if request.method == 'POST':
+#         decoded_data = request.data.decode('utf-8')
+#         params = json.loads(decoded_data)
+#
+#         client.images.push("localhost:5000/" + params['name'], params['tag'])
+#
+#         return jsonify({'PRUEBA NOMBER': params['name'], 'PRUEBA ARRS': params['tag']})
+#
+#
+# @app.route('/check-compose', methods=['POST'])
+# def check_compose():
+#     if request.method == 'POST':
+#         decoded_data = request.data.decode('utf-8')
+#         params = json.loads(decoded_data)
+#
+#         f = tempfile.NamedTemporaryFile()
+#         f.write(params['docker-composeFile'])
+#         with subprocess.Popen(["docker-compose"], stdout=subprocess.PIPE) as proc:
+#             print(jsonify({'PRUEBA': proc.stdout.read(), 'PRUEBA ARRS': "params['tag']"}))
 
 
 Flask.run(app, host='0.0.0.0', port=9090)

@@ -6,7 +6,7 @@ class RabbitHandler:
         credentials = pika.PlainCredentials('rabbituser', '1234')
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(host=host, credentials=credentials,
-                                      connection_attempts=5, retry_delay=5.0))
+                                      connection_attempts=100, retry_delay=5.0))
         self.channel = connection.channel()
 
     def declare_queue(self, name):
