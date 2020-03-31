@@ -51,21 +51,22 @@ services:
     networks:
       - easy-docker-net
 
-#  mysql-database:
-#    container_name: easy-docker-mysql
-#    image: mysql:8.0.19
-#    environment:
-#      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-#      MYSQL_DATABASE: ${MYSQL_DATABASE}
-#      MYSQL_USER: ${MYSQL_USER}
-#      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-#    restart: always
-#    ports:
-#      - "3308:3306"
-#    networks:
-#      - easy-docker-net
-#    volumes:
-#      - ./data:/var/lib/mysql
+  mysql-database:
+    container_name: easy-docker-mysql
+    image: mysql:8.0.19
+    user: root
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    restart: always
+    ports:
+      - "3308:3306"
+    networks:
+      - easy-docker-net
+    volumes:
+      - /tmp/data:/var/lib/mysql
 
   registry:
     container_name: registry
