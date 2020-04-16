@@ -1,83 +1,118 @@
 version: "3.2"
 services:
-#  rest-api:
-#    container_name: rest-api
-#    build:
-#      context: EasyDockerService/
-#      args:
-#        source_dir: ./src/REST
-#    environment:
-#      entry_file: RestApi.py
-#    expose:
-#      - "9090"
-#      - "5000"
-#    ports:
-#      - "5001:5000"
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    networks:
-#      - easy-docker-net
-#
-  rabbitmq:
-    image: rabbitmq:3.8.3-management-alpine
-    container_name: rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    expose:
-      - "5672"
-      - "15672"
-    networks:
-      - easy-docker-net
 
-  rabbit-api:
-    container_name: rabbit-api
-    build:
-      context: EasyDockerService/
-      args:
-        source_dir: ./src/Rabbit
-    depends_on:
-      - rabbitmq
-    tty: true
-    environment:
-      entry_file: DockerFunctions.py
-    ports:
-      - "3000:3000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - easy-docker-net
+    rabbitmq:
+        image: rabbitmq:3.8.3-management-alpine
+        container_name: rabbitmq
+        environment:
+            RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        expose:
+            - "5672"
+            - "15672"
+        networks:
+            - easy-docker-net
 
-  mysql-database:
-    container_name: easy-docker-mysql
-    image: mysql:8.0.19
-    user: root
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    restart: always
-    ports:
-      - "3308:3306"
-    networks:
-      - easy-docker-net
-    volumes:
-      - /tmp/data:/var/lib/mysql
+    rabbit-api-1:
+        container_name: rabbit-api-1
+        build:
+            context: EasyDockerService/
+            args:
+                source_dir: ./src/Rabbit
+        depends_on:
+            - rabbitmq
+        tty: true
+        environment:
+            entry_file: DockerFunctions.py
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        networks:
+            - easy-docker-net
 
-  registry:
-    container_name: registry
-    image: registry
-    ports:
-      - "5000:5000"
-    networks:
-      - easy-docker-net
-    volumes:
-      - ./tmp-registry:/var/lib/registry
+    rabbit-api-2:
+        container_name: rabbit-api-2
+        build:
+            context: EasyDockerService/
+            args:
+                source_dir: ./src/Rabbit
+        depends_on:
+            - rabbitmq
+        tty: true
+        environment:
+            entry_file: DockerFunctions.py
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        networks:
+            - easy-docker-net
+
+    mysql-database:
+        container_name: mysql-database
+        image: mysql:8.0.19
+        user: root
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        restart: always
+        ports:
+            - "3306:3306"
+        networks:
+            - easy-docker-net
+        volumes:
+            - /tmp/data:/var/lib/mysql
+
+    registry:
+        container_name: registry
+        image: registry
+        ports:
+            - "5000:5000"
+        networks:
+            - easy-docker-net
+
+    spring-app-1:
+        container_name: spring-app-1
+        build: ./App
+        ports:
+            - "8081:8443"
+        networks:
+            - easy-docker-net
+        restart: always
+        depends_on:
+            - rabbitmq
+            - registry
+            - mysql-database
+
+    spring-app-2:
+        container_name: spring-app-2
+        build: ./App
+        ports:
+            - "8082:8443"
+        networks:
+            - easy-docker-net
+        restart: always
+        depends_on:
+            - rabbitmq
+            - registry
+            - mysql-database
+
+    haproxy:
+        container_name: haproxy
+        build: ./LoadBalancer
+        restart: always
+        ports:
+            - "8080:80"
+            - "8443:443"
+            - "8404:8404"
+        networks:
+            - easy-docker-net
+        depends_on:
+          - spring-app-1
+          - spring-app-2
 
 networks:
-  easy-docker-net:
+    easy-docker-net:
     
