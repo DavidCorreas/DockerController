@@ -3,7 +3,6 @@ services:
 
     rabbitmq:
         image: rabbitmq:3.8.3-management-alpine
-        container_name: rabbitmq
         environment:
             RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
             RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
@@ -16,8 +15,7 @@ services:
         networks:
             - easy-docker-net
 
-    rabbit-api-1:
-        container_name: rabbit-api-1
+    rabbit-internal-service:
         build:
             context: EasyDockerService/
             args:
@@ -32,27 +30,13 @@ services:
         networks:
             - easy-docker-net
 
-    rabbit-api-2:
-        container_name: rabbit-api-2
-        build:
-            context: EasyDockerService/
-            args:
-                source_dir: ./src/Rabbit
-        depends_on:
-            - rabbitmq
-        tty: true
+    mysql-master:
+        container_name: mysql-master
+        image: bitnami/mysql:8.0.19
         environment:
-            entry_file: DockerFunctions.py
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
-        networks:
-            - easy-docker-net
-
-    mysql-database:
-        container_name: mysql-database
-        image: mysql:8.0.19
-        user: root
-        environment:
+            MYSQL_REPLICATION_MODE: ${MYSQL_REPLICATION_MODE_MASTER}
+            MYSQL_REPLICATION_USER: ${MYSQL_REPLICATION_USER}
+            MYSQL_REPLICATION_PASSWORD: ${MYSQL_REPLICATION_PASSWORD}
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
@@ -65,54 +49,64 @@ services:
         volumes:
             - /tmp/data:/var/lib/mysql
 
+    mysql-slave:
+        image: bitnami/mysql:8.0.19
+        user: root
+        environment:
+            MYSQL_REPLICATION_MODE: ${MYSQL_REPLICATION_MODE_SLAVE}
+            MYSQL_REPLICATION_USER: ${MYSQL_REPLICATION_USER}
+            MYSQL_REPLICATION_PASSWORD: ${MYSQL_REPLICATION_PASSWORD}
+            MYSQL_MASTER_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_MASTER_HOST: ${MYSQL_MASTER_HOST}
+            MYSQL_MASTER_PORT_NUMBER: ${MYSQL_MASTER_PORT_NUMBER}
+        restart: always
+        ports:
+            - "3306"
+        networks:
+            - easy-docker-net
+        depends_on:
+            - mysql-master
+
     registry:
-        container_name: registry
         image: registry
         ports:
             - "5000:5000"
         networks:
             - easy-docker-net
 
-    spring-app-1:
-        container_name: spring-app-1
+    spring-app:
         build: ./App
         ports:
-            - "8081:8443"
+            - "8443"
+        environment:
+            - SERVICE_PORTS=8443
         networks:
             - easy-docker-net
         restart: always
         depends_on:
             - rabbitmq
             - registry
-            - mysql-database
-
-    spring-app-2:
-        container_name: spring-app-2
-        build: ./App
-        ports:
-            - "8082:8443"
-        networks:
-            - easy-docker-net
-        restart: always
-        depends_on:
-            - rabbitmq
-            - registry
-            - mysql-database
+            - mysql-master
+            - mysql-slave
 
     haproxy:
-        container_name: haproxy
-        build: ./LoadBalancer
+        links:
+          - spring-app
+        image: dockercloud/haproxy
         restart: always
         ports:
             - "8080:80"
-            - "8443:443"
-            - "8404:8404"
+            - "1936:1936"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
         networks:
             - easy-docker-net
+        environment:
+            - BALANCE=source
+            - STATS_PORT=1936
+            - MODE=tcp
         depends_on:
-          - spring-app-1
-          - spring-app-2
+          - spring-app
 
 networks:
     easy-docker-net:
-    

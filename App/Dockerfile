@@ -8,9 +8,10 @@ EXPOSE 8443
 
 CMD ["java" , "-jar", "app.jar", \
     "--spring.jpa.hibernate.ddl-auto=create-drop", \
-    "--spring.datasource.url=jdbc:mysql://mysql-database:3306/easy-docker-db?useSSL=false&allowPublicKeyRetrieval=true", \
+    "--spring.datasource.url=jdbc:mysql://mysql-master:3306/easy-docker-db?useSSL=false&allowPublicKeyRetrieval=true", \
     "--spring.datasource.username=root", \
     "--spring.datasource.password=1234", \
+    "--spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver", \
     "--server.port=8443", \
     "--spring.rabbitmq.host=rabbitmq", \
     "--spring.rabbitmq.port=5672", \
