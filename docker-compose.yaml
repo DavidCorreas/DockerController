@@ -77,9 +77,11 @@ services:
     spring-app:
         build: ./App
         ports:
-            - "8443"
+            - "443"
         environment:
-            - SERVICE_PORTS=8443
+            - SERVICE_PORTS=443
+            - EXTRA_SETTINGS=mode tcp, balance source
+            - FORCE_SSL=true
         networks:
             - easy-docker-net
         restart: always
@@ -91,11 +93,11 @@ services:
 
     haproxy:
         links:
-          - spring-app
+            - spring-app
         image: dockercloud/haproxy
         restart: always
         ports:
-            - "8080:80"
+            - "8080:8443"
             - "1936:1936"
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
@@ -104,9 +106,9 @@ services:
         environment:
             - BALANCE=source
             - STATS_PORT=1936
-            - MODE=tcp
+            - EXTRA_FRONTEND_SETTINGS_8443=mode tcp, option tcplog
         depends_on:
-          - spring-app
+            - spring-app
 
 networks:
     easy-docker-net:

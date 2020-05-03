@@ -11,7 +11,7 @@ docker-compose down -v --remove-orphans
 # Deploy the solution.
 docker-compose up --build \
   --scale spring-app=$APP_INSTANCES \
-  --scale rabbit-api=$RABBIT_INSTANCES \
+  --scale rabbit-internal-service=$RABBIT_INSTANCES \
   --scale mysql-slave=$MYSQL_SLAVES_INSTACES
 
 # Check the containers status.
