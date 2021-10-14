@@ -92,9 +92,10 @@ services:
             - mysql-slave
 
     haproxy:
+        container_name: haproxy
+        build: ./LoadBalancer
         links:
-            - spring-app
-        image: dockercloud/haproxy
+          - spring-app
         restart: always
         ports:
             - "8080:8443"

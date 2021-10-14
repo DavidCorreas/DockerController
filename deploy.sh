@@ -6,7 +6,7 @@ RABBIT_INSTANCES=2
 MYSQL_SLAVES_INSTACES=2
 
 # Clean the environment.
-docker-compose down -v --remove-orphans
+# docker-compose down -v --remove-orphans
 
 # Deploy the solution.
 docker-compose up --build \
